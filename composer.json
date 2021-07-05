@@ -1,6 +1,7 @@
 {
     "name": "itsnubix/nubix-preset",
     "description": "Nubix preset for Laravel (^8.0).",
+    "license": "MIT",
     "keywords": [
         "tailwind",
         "tailwindcss",
