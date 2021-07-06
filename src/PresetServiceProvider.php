@@ -1,12 +1,10 @@
 <?php
 
 
-namespace ItsNubix\Preset;
-
+namespace Nubix\Preset;
 
 use Illuminate\Support\ServiceProvider;
 use Laravel\Ui\UiCommand;
-
 
 class PresetServiceProvider extends ServiceProvider
 {
@@ -19,7 +17,7 @@ class PresetServiceProvider extends ServiceProvider
             // Let the user know what we've done
             $command->info('Your preset has been installed successfully.');
 
-            $command->comment('Please run "npm install && npm run dev" to compile your new assets.');
+            $command->comment('Please run "composer install && npm install && npm run dev" to compile your new assets.');
         });
     }
 }
