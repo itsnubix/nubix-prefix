@@ -192,8 +192,8 @@ class Preset extends BasePreset
     }
 
     // update the composer JSON array
-    protected static function updateComposerArray(array $composer)
+    protected static function updateComposerArray(array $packages)
     {
-        return array_merge($composer, static::COMPOSER_DEV_PACKAGES_TO_ADD);
+        return array_merge($packages, static::COMPOSER_DEV_PACKAGES_TO_ADD);
     }
 }
