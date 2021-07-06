@@ -182,6 +182,13 @@ class Preset extends BasePreset
             array_key_exists($configurationKey, $composer) ? $composer[$configurationKey] : [],
             $configurationKey
         );
+
+        ksort($composer[$configurationKey]);
+
+        file_put_contents(
+            base_path('composer.json'),
+            json_encode($composer, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).PHP_EOL
+        );
     }
 
     // update the composer JSON array
