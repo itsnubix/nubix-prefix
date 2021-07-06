@@ -1,12 +1,11 @@
 <?php
 
-namespace ItsNubix\Preset;
+namespace Nubix\Preset;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 use Laravel\Ui\Presets\Preset as BasePreset;
-
 
 class Preset extends BasePreset
 {
@@ -31,6 +30,12 @@ class Preset extends BasePreset
         'format' => 'npm run prettier && npm run eslint && npm run php-fixer'
     ];
 
+    const COMPOSER_DEV_PACKAGES_TO_ADD = [
+        'barryvdh/laravel-debugbar' => '^3.5',
+        'beyondcode/laravel-dump-server' => '^1.7',
+        'itsnubix/laravel-nuke' => '^1.0',
+    ];
+
     const GITIGNORES = [
         '.DS_Store',
         '.php-cs-fixer.cache'
@@ -39,6 +44,7 @@ class Preset extends BasePreset
     public static function install()
     {
         static::updatePackages(true);
+        static::updateComposer(true);
         static::updatePackageScripts();
 
         static::updateDirectories();
@@ -50,7 +56,6 @@ class Preset extends BasePreset
 
         // should perform after breeze install since it has to change some breeze generated files.
         static::updateFiles();
-
     }
 
     private static function updateFiles()
@@ -58,7 +63,7 @@ class Preset extends BasePreset
         $filesystem = new Filesystem();
 
         // Append the default .gitignore
-        $filesystem->append(base_path('.gitignore'), "\n".implode("\n",static::GITIGNORES));
+        $filesystem->append(base_path('.gitignore'), "\n".implode("\n", static::GITIGNORES));
 
         // Code style configuration
         $filesystem->copy(__DIR__.'/../stubs/.editorconfig', base_path('.editorconfig'));
@@ -71,30 +76,45 @@ class Preset extends BasePreset
 
         // remove requiring bootstrap.js
         static::updateFile(base_path('resources/js/app.js'), function ($file) {
-            return str_replace("require('./bootstrap');",
-                '', $file);
+            return str_replace(
+                "require('./bootstrap');",
+                '',
+                $file
+            );
         });
 
         // Add Inter var font source to head
         static::updateFile(base_path('resources/views/app.blade.php'), function ($file) {
-            return str_replace('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">',
-                '<link rel="stylesheet" href="https://rsms.me/inter/inter.css">', $file);
+            return str_replace(
+                '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">',
+                '<link rel="stylesheet" href="https://rsms.me/inter/inter.css">',
+                $file
+            );
         });
         static::updateFile(base_path('resources/views/welcome.blade.php'), function ($file) {
-            return str_replace('<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">',
-                '<link rel="stylesheet" href="https://rsms.me/inter/inter.css">', $file);
+            return str_replace(
+                '<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">',
+                '<link rel="stylesheet" href="https://rsms.me/inter/inter.css">',
+                $file
+            );
         });
 
         // update tailwindcss config to use JIT mode
         static::updateFile(base_path('tailwind.config.js'), function ($file) {
-            return str_replace('purge',
-                "mode: 'jit',\n\tpurge", $file);
+            return str_replace(
+                'purge',
+                "mode: 'jit',\n\tpurge",
+                $file
+            );
         });
 
         // update tailwindcss to use Inter var font as first option.
         static::updateFile(base_path('tailwind.config.js'), function ($file) {
-            return str_replace('Nunito',
-                'Inter var', $file);
+            return str_replace(
+                'Nunito',
+                'Inter var',
+                $file
+            );
         });
     }
 
@@ -103,7 +123,7 @@ class Preset extends BasePreset
         $filesystem = new Filesystem();
 
         // copy github actions configurations
-        $filesystem->copyDirectory(__DIR__ . '/../stubs/.github', base_path());
+        $filesystem->copyDirectory(__DIR__ . '/../stubs/.github', base_path('.github'));
     }
 
     protected static function updatePackageArray(array $packages)
@@ -135,8 +155,10 @@ class Preset extends BasePreset
         $packages = json_decode(file_get_contents(base_path('package.json')), true);
 
 
-        $packages[$configurationKey] = array_merge(static::NPM_SCRIPT_TO_ADD,
-            $packages[$configurationKey]);
+        $packages[$configurationKey] = array_merge(
+            static::NPM_SCRIPT_TO_ADD,
+            $packages[$configurationKey]
+        );
 
         ksort($packages[$configurationKey]);
 
@@ -146,4 +168,32 @@ class Preset extends BasePreset
         );
     }
 
+    protected static function updateComposer($dev = true)
+    {
+        if (! file_exists(base_path('composer.json'))) {
+            return;
+        }
+
+        $configurationKey = $dev ? 'require-dev' : 'require';
+
+        $composer = json_decode(file_get_contents(base_path('composer.json')), true);
+
+        $composer[$configurationKey] = static::updateComposerArray(
+            array_key_exists($configurationKey, $composer) ? $composer[$configurationKey] : [],
+            $configurationKey
+        );
+
+        ksort($composer[$configurationKey]);
+
+        file_put_contents(
+            base_path('composer.json'),
+            json_encode($composer, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).PHP_EOL
+        );
+    }
+
+    // update the composer JSON array
+    protected static function updateComposerArray(array $packages)
+    {
+        return array_merge($packages, static::COMPOSER_DEV_PACKAGES_TO_ADD);
+    }
 }
