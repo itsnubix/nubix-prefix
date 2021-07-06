@@ -123,7 +123,7 @@ class Preset extends BasePreset
         $filesystem = new Filesystem();
 
         // copy github actions configurations
-        $filesystem->copyDirectory(__DIR__ . '/../stubs/.github', base_path());
+        $filesystem->copyDirectory(__DIR__ . '/../stubs/.github', base_path('.github'));
     }
 
     protected static function updatePackageArray(array $packages)
@@ -174,7 +174,7 @@ class Preset extends BasePreset
             return;
         }
 
-        $configurationKey = $dev ? 'require' : 'require-dev';
+        $configurationKey = $dev ? 'require-dev' : 'require';
 
         $composer = json_decode(file_get_contents(base_path('composer.json')), true);
 
@@ -192,11 +192,8 @@ class Preset extends BasePreset
     }
 
     // update the composer JSON array
-    protected static function updateComposerArray(array $packages)
+    protected static function updateComposerArray(array $composer)
     {
-        return array_merge(
-            static::COMPOSER_DEV_PACKAGES_TO_ADD,
-            Arr::except($packages, static::COMPOSER_DEV_PACKAGES_TO_ADD)
-        );
+        return array_merge($composer, static::COMPOSER_DEV_PACKAGES_TO_ADD);
     }
 }
