@@ -3,10 +3,9 @@
 ## Presets
 * Laravel Breeze
 * Laravel Sail
-* Tailwindcss with JIT mode
-* Tailwindui
-* Github actions
-* Mysql
+* TailwindCSS with JIT mode
+* Common GitHub actions
+* MySQL
 * Vue 3
 * Code Linters
     * Eslint
