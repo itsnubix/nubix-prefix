@@ -63,7 +63,7 @@ class Preset extends BasePreset
         $filesystem = new Filesystem();
 
         // Append the default .gitignore
-        $filesystem->append(base_path('.gitignore'), "\n".implode("\n", static::GITIGNORES));
+        $filesystem->append(base_path('.gitignore'), "\n".implode("\n", static::GITIGNORES)."\n");
 
         // Code style configuration
         $filesystem->copy(__DIR__.'/../stubs/.editorconfig', base_path('.editorconfig'));
@@ -123,7 +123,7 @@ class Preset extends BasePreset
         $filesystem = new Filesystem();
 
         // copy github actions configurations
-        $filesystem->copyDirectory(__DIR__ . '/../stubs/.github', base_path('.github'));
+        $filesystem->copyDirectory(__DIR__.'/../stubs/.github', base_path('.github'));
     }
 
     protected static function updatePackageArray(array $packages)
@@ -153,7 +153,6 @@ class Preset extends BasePreset
         $configurationKey = 'scripts';
 
         $packages = json_decode(file_get_contents(base_path('package.json')), true);
-
 
         $packages[$configurationKey] = array_merge(
             static::NPM_SCRIPT_TO_ADD,
