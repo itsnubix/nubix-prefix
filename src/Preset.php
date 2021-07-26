@@ -38,7 +38,8 @@ class Preset extends BasePreset
 
     const GITIGNORES = [
         '.DS_Store',
-        '.php-cs-fixer.cache'
+        '.php-cs-fixer.cache',
+        'auth.json',
     ];
 
     public static function install()
